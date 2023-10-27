@@ -1,5 +1,7 @@
 import sys
 import json
+import platform
+import subprocess
 
 
 def main():
@@ -13,8 +15,9 @@ def main():
 
         match keuze:
             case 1:
-                server = input("Welke server wilt u toevoegn: ")
-                print("server toevoegend")
+                servernaam = input("Welke server wilt u toevoegn (naam): ")
+                ServerToevoegen(servernaam)
+                print("server toegevoegd")
             case 2:
                 print("server verwijderd")
             case 3:
@@ -25,8 +28,9 @@ def main():
         keuze2 = int(sys.argv[1])
         match keuze2:
             case 1:
-                server = input("Welke server wilt u toevoegn: ")
-                ServerToevoegen(server)
+                servernaam = input("Welke server wilt u toevoegn (naam): ")
+                serverok = myping(servernaam)
+                ServerToevoegen(servernaam, serverok)
                 print("server toegevoegd")
             case 2:
                 print("server verwijderd")
@@ -36,14 +40,34 @@ def main():
                 print("foute invoer")
 
 
-def ServerToevoegen(invoer):
+def ServerToevoegen(naam, serverok):
     data = {
-        "server": invoer
+        "naam": naam
     }
-    with open("ingevoerde_data.json", "w") as data_file:
-        json.dump(data, data_file)
+    with open("ingevoerde_data.json", "a") as data_file:
+        representation = json.dumps(data)
+        data_file.write(representation + "\n")
 
-    print("Gegevens zijn opgeslagen in 'ingevoerde_data.json'.")
+    dataserver = {
+        "naam": naam,
+        "serverok": serverok
+    }
+    with open("serverok.json", "a") as data_file:
+        representation2 = json.dumps(dataserver)
+        data_file.write(representation2 + ",\n")
+    print("Gegevens zijn opgeslagen in 'severok.json'.")
+
+
+def myping(host):
+    parameter = "-n" if platform.system().lower() == "windows" else "-c"
+
+    command = ["ping", parameter, "1", host]
+    response = subprocess.call(command)
+
+    if response == 0:
+        return True
+    else:
+        return False
 
 
 if __name__ == '__main__':
