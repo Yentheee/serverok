@@ -1,7 +1,6 @@
 import sys
 import json
-import platform
-import subprocess
+from ping3 import ping
 
 
 def main():
@@ -19,6 +18,8 @@ def main():
                 ServerToevoegen(servernaam)
                 print("server toegevoegd")
             case 2:
+                server = input("welke server wilt u verwijderen: ")
+                ServerVerwijderen(server)
                 print("server verwijderd")
             case 3:
                 print("lijst bekijken")
@@ -33,6 +34,8 @@ def main():
                 ServerToevoegen(servernaam, serverok)
                 print("server toegevoegd")
             case 2:
+                server = input("welke server wilt u verwijderen: ")
+                ServerVerwijderen(server)
                 print("server verwijderd")
             case 3:
                 print("lijst bekijken")
@@ -41,34 +44,66 @@ def main():
 
 
 def ServerToevoegen(naam, serverok):
-    data = {
-        "naam": naam
-    }
-    with open("ingevoerde_data.json", "a") as data_file:
+    with open("ingevoerde_data.json", "r") as bestand:
+        data = json.load(bestand)
+
+    with open("serverok.json", "r") as bestand:
+        serverdata = json.load(bestand)
+
+    data["server"].append(naam)
+
+    serverdata["server"].append(naam)
+    serverdata["serverok"].append(serverok)
+
+    with open("ingevoerde_data.json", "w") as data_file:
         representation = json.dumps(data)
-        data_file.write(representation + "\n")
+        data_file.write(representation)
 
-    dataserver = {
-        "naam": naam,
-        "serverok": serverok
-    }
-    with open("serverok.json", "a") as data_file:
-        representation2 = json.dumps(dataserver)
-        data_file.write(representation2 + ",\n")
-    print("Gegevens zijn opgeslagen in 'severok.json'.")
+    with open("serverok.json", "w") as data_file:
+        representation2 = json.dumps(serverdata)
+        data_file.write(representation2)
 
+
+def ServerVerwijderen(server):
+    with open("ingevoerde_data.json", "r") as bestand:
+        data = json.load(bestand)
+
+    if "server" in data:
+        if server in data["server"]:
+            data["server"].remove(server)
+
+    with open("ingevoerde_data.json", "w") as data_file:
+        representation = json.dumps(data)
+        data_file.write(representation)
+
+    with open("serverok.json", "r") as bestand:
+        server_data = json.load(bestand)
+
+    if "server" in server_data:
+        if server in server_data["server"]:
+            positie = server_data["server"].index(server)
+            server_data["server"].remove(server)
+            if positie < len(server_data["serverok"]):
+                del server_data["serverok"][positie]
+
+    with open("serverok.json", "w") as data_file:
+        representation = json.dumps(server_data)
+        data_file.write(representation)
+
+
+def lijst_weergeven():
+    
 
 def myping(host):
-    parameter = "-n" if platform.system().lower() == "windows" else "-c"
+    resp = ping(host)
 
-    command = ["ping", parameter, "1", host]
-    response = subprocess.call(command)
-
-    if response == 0:
-        return True
-    else:
+    if resp == False:
         return False
+    else:
+        return True
 
 
 if __name__ == '__main__':
+    data_list = []
+    serverok_list = []
     main()
