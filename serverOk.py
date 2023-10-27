@@ -92,7 +92,7 @@ def ServerVerwijderen(server):
 
 
 def lijst_weergeven():
-    
+
 
 def myping(host):
     resp = ping(host)
@@ -107,3 +107,4 @@ if __name__ == '__main__':
     data_list = []
     serverok_list = []
     main()
+
