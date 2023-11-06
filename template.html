@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Server Status</title>
+</head>
+<body>
+    <h1>Server Status</h1>
+    <ul>
+        {% for server, status in server_status.items() %}
+        <li>{{ server }}: {{ status }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
